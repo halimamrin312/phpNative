@@ -32,9 +32,9 @@ class Database
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
                     ]
                 );
-                echo ' Koneksi DB Berhasil</br></br>';
+                echo ' DB Connected</br></br>';
             } catch (PDOException $e) {
-                die('Koneksi DB Gagal :' . $e->getMessage());
+                die('DB Connection Failed :' . $e->getMessage());
             }
         }
         return self::$instance;

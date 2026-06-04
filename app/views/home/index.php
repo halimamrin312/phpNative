@@ -10,8 +10,16 @@
 </head>
 
 <body>
-    <h1>Selamat Datang Di Halaman Utama Admin</h1>
-    <a href=<?= '?url=LockerController' ?>>Lihat Loker</a>
+    <h1>Welcome Back Admin</h1>
+    <h2>Menu</h2>
+    <ul>
+        <li>
+            <a href=<?= '?url=LockerController' ?>>See Lockers</a>
+        </li>
+        <li>
+            <a href=<?= '?url=RentalController' ?>>See Rentals</a>
+        </li>
+    </ul>
 </body>
 
 </html>

@@ -1,28 +1,42 @@
 <?php
 class LockerController extends Controller
 {
+    private $lockerModel;
+
+    public function __construct()
+    {
+        $this->lockerModel = $this->model('LockerModel');
+    }
     public function index()
     {
         $data['judul'] = 'myLocker';
-        $data['lockers'] = $this->model('LockerModel')->getAllLockers();
+        $data['lockers'] = $this->lockerModel->getAllLockers();
         $data['controller'] = basename(__FILE__, '.php');
         return $this->view('locker/index', $data);
+        // $pass = "anjay123";
+        // $passHash = password_hash($pass, PASSWORD_DEFAULT);
+        // $test = "anjay123";
+        // $passUnHash = password_verify($test, $passHash);
+        // echo $passHash . "</br>";
+        // echo $passUnHash;
     }
     public function create()
     {
         $data['judul'] = 'myLocker';
-        $data['nextId'] = $this->model('LockerModel')->getLastId();
+        $data['nextId'] = $this->lockerModel->getLastId();
         $data['nextId'] = str_replace('LK-', '', $data['nextId']);
         $data['nextId'] = intval($data['nextId']) + 1;
-        return $this->view('locker/create', $data);
         // echo $data['nextId'];
+        return $this->view('locker/create', $data);
     }
 
     public function createStore()
     {
         $id = htmlspecialchars($_POST['id']);
         $secreetKey = htmlspecialchars($_POST['secreetKey']);
-        $valid = $this->model('LockerModel')->createLocker($id, $secreetKey);
+
+        $valid = $this->lockerModel->createLocker($id, $secreetKey);
+
         if ($valid) {
             return $this->index();
         } else {
@@ -32,7 +46,7 @@ class LockerController extends Controller
 
     public function delete($id)
     {
-        $valid = $this->model('LockerModel')->deleteLocker($id);
+        $valid = $this->lockerModel->deleteLocker($id);
 
         if ($valid) {
             return $this->index();
@@ -40,10 +54,17 @@ class LockerController extends Controller
             echo "Locker gagal dihapus";
         }
     }
+
+    public function sneakDelete()
+    {
+        $id = htmlspecialchars($_POST['id']);
+        $this->delete($id);
+    }
+
     public function edit($id)
     {
         $data['judul'] = 'myLocker';
-        $valid = $this->model('LockerModel')->getLocker($id);
+        $valid = $this->lockerModel->getLocker($id);
         if ($valid) {
             $data['locker'] = $valid;
             return $this->view('locker/edit', $data);
@@ -57,15 +78,17 @@ class LockerController extends Controller
     {
         $data['id'] = htmlspecialchars($_POST['id']);
         $data['oldSecreetKey'] = htmlspecialchars($_POST['oldSecreetKey']);
-        $validPassword = $this->model('LockerModel')->openLocker($data['id'], $data['oldSecreetKey']);
+
+        $validPassword = $this->lockerModel->openLocker($data['id'], $data['oldSecreetKey']);
 
         if ($validPassword) {
             echo "Password Matching";
 
             $data['status'] = htmlspecialchars($_POST['status']);
             $data['secreetKey'] = htmlspecialchars($_POST['secreetKey']);
+
             // echo json_encode($data);
-            $validUpdate = $this->model('LockerModel')->updateLocker($data);
+            $validUpdate = $this->lockerModel->updateLocker($data);
 
             if ($validUpdate) {
                 $this->index();
@@ -80,13 +103,13 @@ class LockerController extends Controller
 
     public function openLocker($id, $secretKey)
     {
-        $valid = $this->model('LockerModel')->openLocker($id, $secretKey);
+        $valid = $this->lockerModel->openLocker($id, $secretKey);
 
         if ($valid) {
-            echo "Locker telah terbuka";
+            echo "Locker has been opened";
             echo "Locker ID: " . $id . " secretKey: " . $secretKey;
         } else {
-            echo "Locker tidak valid";
+            echo "Locker is not valid";
         }
     }
 

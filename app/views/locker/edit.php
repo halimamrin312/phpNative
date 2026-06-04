@@ -16,11 +16,11 @@
         <input type="text" name="status" id="status" value=<?= $data['locker']['status']; ?> readonly></br>
 
         <label for="oldSecreetKey">old Secreet Key</label>
-        <input type="text" name="oldSecreetKey" id="oldSecreetKey"></br>
+        <input type="password" name="oldSecreetKey" id="oldSecreetKey"></br>
 
 
         <label for="secreetKey">new Secreet Key</label>
-        <input type="text" name="secreetKey" id="secreetKey"></br>
+        <input type="password" name="secreetKey" id="secreetKey"></br>
 
         <input type="submit" value="Update">
     </form>

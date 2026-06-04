@@ -19,6 +19,12 @@ class LockerModel
         return $stmt->fetchAll();
     }
 
+    public function getNotOwnedLockers(): array
+    {
+        $stmt = $this->db->query('SELECT id FROM lockers where status = "not_owned"');
+        return $stmt->fetchAll();
+    }
+
     public function getLocker($id)
     {
         $sql = 'SELECT id, status FROM lockers where id = :id';
@@ -29,10 +35,11 @@ class LockerModel
 
     public function createLocker($id, $secreetKey): bool
     {
+        $secreetKeyHashed = password_hash($secreetKey, PASSWORD_DEFAULT);
         $id = 'LK-' . $id;
         $sql = 'INSERT INTO lockers (id, secreetKey) VALUES (:id, :secreetKey)';
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $id, ':secreetKey' => $secreetKey]);
+        $stmt->execute([':id' => $id, ':secreetKey' => $secreetKeyHashed]);
         return $stmt->rowCount() > 0;
     }
 
@@ -46,9 +53,10 @@ class LockerModel
 
     public function updateLocker($data): bool
     {
+        $hashedSecretKey = password_hash($data['secreetKey'], PASSWORD_DEFAULT);
         $sql = 'UPDATE lockers SET secreetKey = :secreetKey ,status = :status WHERE id = :id';
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $data['id'], ':secreetKey' => $data['secreetKey'], ':status' => $data['status']]);
+        $stmt->execute([':id' => $data['id'], ':secreetKey' => $hashedSecretKey, ':status' => $data['status']]);
         return $stmt->rowCount() > 0;
     }
 
@@ -60,10 +68,12 @@ class LockerModel
      */
     public function openLocker(string $id, string $secretKey): bool
     {
-        $sql = 'SELECT COUNT(*) FROM lockers WHERE id = :id AND secreetKey = :secretKey';
+
+        $sql = 'SELECT secreetKey FROM lockers WHERE id = :id;';
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $id, ':secretKey' => $secretKey]);
-        return $stmt->fetchColumn() > 0;
+        $stmt->execute([':id' => $id]);
+        $row = $stmt->fetch();
+        return $row && password_verify($secretKey, $row['secreetKey']);
     }
     public function getLastId()
     {
